@@ -1,0 +1,59 @@
+#include <iostream>
+#include "vector"
+#include "string"
+#include "algorithm"
+#include "queue"
+#include "unordered_map"
+#define ll long long
+#define inf 0x3f3f3f3f
+#define ls st<<1
+#define rs st<<1|1
+using namespace std;
+
+/*ll n,m;
+ll f[555000];
+ll sum[550000];
+ll find(ll x){//带权并查集
+    if(f[x]==x) return x;
+    ll t=f[x];
+    f[x]=find(f[x]);
+    sum[x]+=sum[t];
+    return f[x];
+}
+*/
+/*int find(int x){//并查集查询
+    if(f[x]==x) return f[x];
+    else return f[x]=find(f[x]);
+}
+ */
+/*
+void link(ll x,ll y){//并查集连接
+    f[find(x)]=find(y);
+}
+*/
+/*
+typedef struct{
+    ll l,r;
+    ll val;
+}edge;
+std::vector<edge> v;
+edge temp;
+ll ans=0;
+
+bool cmp(edge z,edge c){
+    return z.val<c.val;
+}
+*/
+/*
+int v[200][200];
+void kr(){//最小生成树kr算法
+    std::sort(v.begin(),v.end(),cmp);
+    ans=0;
+    ll i;
+    for(i=1;i<=n;i++) f[i]=i;
+    for(i=0;i<v.size();i++){
+        if(find(v[i].l)==find(v[i].r)) continue;//两城已经相连
+        f[find(v[i].l)]=find(v[i].r);
+        ans+=v[i].val;
+    }
+}*/
