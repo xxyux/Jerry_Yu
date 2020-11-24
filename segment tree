@@ -75,3 +75,79 @@ void change_interval(int x,int tl,int tr,int st,int l,int r){//区间修改
     if(tr>mid) change_interval(x,tl,tr,rs,mid+1,r);
     push_up(st);
 }
+-----------------------------------------------------------------------
+//动态改点,在线
+//leetcode 715
+//题目大意：1.选取/移除一段区间 2.查询一段区间有多少个元素被选取
+
+#define mid (l+r)/2
+#define MAX 500500
+#define M 1e9
+using namespace std;
+
+int v[MAX],ls[MAX],rs[MAX],lazy[MAX];
+int cnt,root;
+class RangeModule {
+public:
+    void init(int &st){//新建子节点，更新st为新开的节点
+        st=++cnt;
+        v[st]=ls[st]=rs[st]=lazy[st]=0;
+    }
+    void push_down(int st){//下放
+        if(lazy[st]==0) return;
+        if(ls[st]==0) init(ls[st]);//左节点为空
+        if(rs[st]==0) init(rs[st]);//右节点为空
+        int l=ls[st],r=rs[st];
+        if(v[st]){//v[st]不为0，那么必为r-l+1
+            v[l]=v[st]/2+(v[st]&1);
+            v[r]=v[st]-v[l];
+        }
+        else v[l]=v[r]=0;//v[st]=0
+        lazy[l]=lazy[r]=1;
+        lazy[st]=0;
+    }
+    void push_up(int st){//上传
+        int l=ls[st],r=rs[st];
+        v[st]=v[l]+v[r];
+    }
+    void change_interval(int tl,int tr,int x,int l,int r,int &st){//区间修改
+        if(st==0) {//到了空节点
+            init(st);
+        }
+        if(tl<=l&&r<=tr) {//找到子区间了
+            if(x==1) v[st]=r-l+1;//x=1表示该区间全部选上
+            else v[st]=0;//x=0表示该区间全部不被选上
+            lazy[st]=1;//到此为止，下次再到该区间时下放
+            return;
+        }
+        push_down(st);//下放
+        if(tl<=mid) change_interval(tl,tr,x,l,mid,ls[st]);//左区间
+        if(mid<tr) change_interval(tl,tr,x,mid+1,r,rs[st]);//右区间
+        push_up(st);//上传
+    }
+    int ask_interval(int tl,int tr,int l,int r,int st){//区间查询
+        if(st==0) return 0;//查到底了
+        if(tl<=l&&r<=tr) return v[st];//子区间，加上
+        push_down(st);//下放
+        int ans=0;
+        if(tl<=mid) ans+=ask_interval(tl,tr,l,mid,ls[st]);
+        if(mid<tr) ans+=ask_interval(tl,tr,mid+1,r,rs[st]);
+        return ans;
+    }
+    RangeModule() {
+        cnt=0;
+        init(root);
+    }
+
+    void addRange(int left, int right) {
+        change_interval(left,right-1,1,0,M,root);
+    }
+
+    bool queryRange(int left, int right) {
+        return ask_interval(left,right-1,0,M,root)==right-left;
+    }
+
+    void removeRange(int left, int right) {
+        change_interval(left,right-1,0,0,M,root);
+    }
+};
