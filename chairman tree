@@ -1,0 +1,88 @@
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <stack>
+#include <set>
+#include <map>
+#include "queue"
+#include <unordered_map>
+#define inf 0x3f3f3f3f
+#define min_ -2147483648
+#define ll long long
+#define ls st<<1
+#define rs st<<1|1
+#define mid (l+r)/2
+#define MAX 500050
+#define M 1e9
+using namespace std;
+//解决区间第k大/小
+int v[MAX*32];
+int lt[MAX*32];
+int rt[MAX*32];
+int root[MAX*32];
+int n,m;
+int q;//离散化后序列长度
+int a[MAX];
+int cur;
+vector<int> vvr;//离散化
+
+void discretization(){
+    sort(vvr.begin(),vvr.end());
+    q=unique(vvr.begin(),vvr.end())-vvr.begin();
+    for(int i=0;i<n;i++){
+        a[i]=lower_bound(vvr.begin(),vvr.begin()+q,a[i])-vvr.begin()+1;
+    }
+}
+
+void build(int l,int r,int &st){
+    st=++cur;
+    v[st]=0;
+    if(l==r) return;
+    build(l,mid,lt[st]);
+    build(mid+1,r,rt[st]);
+}
+
+int update(int pos,int l,int r,int o){//pos在l,r区间上,权值加一
+    int oo=++cur;//新开一个节点
+    v[oo]=v[o]+1;
+    lt[oo]=lt[o];
+    rt[oo]=rt[o];
+    if(l==r) return oo;
+    if(pos<=mid) lt[oo]=update(pos,l,mid,lt[oo]);
+    else rt[oo]=update(pos,mid+1,r,rt[oo]);
+    return oo;
+}
+
+int ask(int v_l,int v_r,int l,int r,int k){
+    int x=v[lt[v_r]]-v[lt[v_l]];
+    if(l==r) return l;
+    if(x>=k) return ask(lt[v_l],lt[v_r],l,mid,k);
+    else return ask(rt[v_l],rt[v_r],mid+1,r,k-x);
+}
+
+
+int main(){
+    cin>>n>>m;
+    int i;
+    for(i=0;i<n;i++){
+        scanf("%d",&a[i]);
+        vvr.push_back(a[i]);
+    }
+    cur=0;
+    discretization();//离散化
+//    for(i=0;i<n;i++) cout<<a[i]<<" ";
+    build(1,q,root[0]);
+    for(i=0;i<n;i++){
+        root[i+1]=update(a[i],1,q,root[i]);
+    }
+    int x,y,k;
+    while (m--){
+        scanf("%d%d%d",&x,&y,&k);
+        int ans=ask(root[x-1],root[y],1,q,k);
+        cout<<vvr[ans-1]<<endl;
+    }
+}
+
+
+
+
