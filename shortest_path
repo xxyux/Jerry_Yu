@@ -61,3 +61,57 @@ int main(){
         cout<<dis[n]<<endl;
     }
 }
+
+--------------优先队列优化后的-----------------------------
+typedef struct edge{
+    int to;
+    int val;
+    friend bool operator < (struct edge x,struct edge y){
+        if(x.val!=y.val) return x.val>y.val;
+        else return x.to>y.to;
+    }
+}edge;
+edge t,jo;
+vector<edge> v[100500];//邻接表
+int ff[100500];//标记是否选过
+int dis[100500];//答案
+
+void Dijkstra(int s){
+    priority_queue<edge> p;
+    memset(ff,0,sizeof(ff));
+    memset(dis,inf,sizeof(dis));
+    dis[s]=0;
+    jo.to=s,jo.val=0;
+    p.push(jo);
+    while (!p.empty()){
+        t=p.top();
+        p.pop();
+        int cur=t.to;
+        if(ff[cur]==1) continue;
+        ff[cur]=1;
+        for(int a=0;a<v[cur].size();a++){
+            if(dis[cur]+v[cur][a].val<dis[v[cur][a].to]) {
+                jo.to=v[cur][a].to;
+                jo.val=dis[cur]+v[cur][a].val;
+                dis[v[cur][a].to]=jo.val;
+                p.push(jo);
+            }
+        }
+    }
+}
+
+
+void solve(){
+    int n,m,s;
+    cin>>n>>m>>s;
+    int i,x,y,z;
+    for(i=1;i<=m;i++){
+        cin>>x>>y>>z;
+        t.to=y;t.val=z;
+        v[x].push_back(t);
+    }
+    Dijkstra(s);
+    for(i=1;i<=n;i++) {
+        cout<<dis[i]<<" ";
+    }
+}
