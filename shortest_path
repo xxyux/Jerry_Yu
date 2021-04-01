@@ -1,0 +1,117 @@
+#include <iostream>
+#include "vector"
+#include "string"
+#include "stack"
+#include "algorithm"
+#include "queue"
+#include "unordered_map"
+
+#define ll long long
+#define inf 0x3f3f3f3f
+#define ls st<<1
+#define rs st<<1|1
+#define mid (l+r)/2
+using namespace std;
+
+//单源最短路，时间复杂度O(N^2)
+int n,m;
+int v[200][200];//邻接矩阵
+int dis[200];//答案数组
+int f[200];//标记数组
+
+void dj(){
+    int i,a;
+    int min_;
+    int pos=1;
+    for(i=1;i<=n;i++){//初始化dis数组
+        if(v[1][i]>0) dis[i]=v[1][i];
+    }
+    for(i=0;i<n-1;i++){//找到剩余n-1个点的最短路
+        min_=inf;
+        for(a=1;a<=n;a++){//找已知没有用过最短节点pos
+            if(f[a]==0) {
+                if(min_>dis[a]){
+                    min_=dis[a];
+                    pos=a;
+                }
+            }
+        }
+        f[pos]=1;
+        for(a=1;a<=n;a++){//贪心外延
+            if(v[pos][a]>0){
+                dis[a]=min(dis[a],dis[pos]+v[pos][a]);
+            }
+        }
+    }
+}
+
+int main(){
+    while(scanf("%d%d",&n,&m)!=EOF&&(n!=0||m!=0)){
+        int i,a,x,y,z;
+        memset(v,0,sizeof(v));
+        memset(dis,inf,sizeof(dis));
+        memset(f,0,sizeof(f));
+        f[1]=1;
+        for(i=0;i<m;i++){
+            scanf("%d%d%d",&x,&y,&z);
+            v[x][y]=z;
+            v[y][x]=z;
+        }
+        dj();
+        cout<<dis[n]<<endl;
+    }
+}
+
+--------------优先队列优化后的-----------------------------
+typedef struct edge{
+    int to;
+    int val;
+    friend bool operator < (struct edge x,struct edge y){
+        if(x.val!=y.val) return x.val>y.val;
+        else return x.to>y.to;
+    }
+}edge;
+edge t,jo;
+vector<edge> v[100500];//邻接表
+int ff[100500];//标记是否选过
+int dis[100500];//答案
+
+void Dijkstra(int s){
+    priority_queue<edge> p;
+    memset(ff,0,sizeof(ff));
+    memset(dis,inf,sizeof(dis));
+    dis[s]=0;
+    jo.to=s,jo.val=0;
+    p.push(jo);
+    while (!p.empty()){
+        t=p.top();
+        p.pop();
+        int cur=t.to;
+        if(ff[cur]==1) continue;
+        ff[cur]=1;
+        for(int a=0;a<v[cur].size();a++){
+            if(dis[cur]+v[cur][a].val<dis[v[cur][a].to]) {
+                jo.to=v[cur][a].to;
+                jo.val=dis[cur]+v[cur][a].val;
+                dis[v[cur][a].to]=jo.val;
+                p.push(jo);
+            }
+        }
+    }
+}
+
+
+void solve(){
+    int n,m,s;
+    cin>>n>>m>>s;
+    int i,x,y,z;
+    for(i=1;i<=m;i++){
+        cin>>x>>y>>z;
+        t.to=y;t.val=z;
+        v[x].push_back(t);
+    }
+    Dijkstra(s);
+    for(i=1;i<=n;i++) {
+        cout<<dis[i]<<" ";
+    }
+}
