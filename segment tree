@@ -58,7 +58,7 @@ int ask_interval(int tl,int tr,int st,int l,int r){//区间查询
     if(tl<=l&&r<=tr) {
         return deg[st];
     }
-    push_down(st,mid-l-1,r-mid);
+    push_down(st,mid-l+1,r-mid);
     int res=0;
     if(tl<=mid) res+=ask_interval(tl,tr,ls,l,mid);
     if(mid<tr) res+=ask_interval(tl,tr,rs,mid+1,r);
